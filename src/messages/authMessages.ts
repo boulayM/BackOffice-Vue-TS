@@ -1,0 +1,28 @@
+export const authMessages = {
+  userOnly: "Acces reserve aux clients",
+  adminOnly: "Acces reserve aux administrateurs",
+  loginInvalid: "Identifiants invalides",
+  loginLimitReached:
+    "Limite de tentatives atteinte. Réessayez dans 15 minutes !",
+  loginRemaining: (remaining, total) =>
+    `Tentatives restantes: ${remaining} / ${total}.`,
+  accessDeniedAuth: "Acces refuse. Connectez-vous pour continuer.",
+  accessDeniedRole: "Acces refuse. Droits insuffisants.",
+  serverError: "Erreur serveur. Reessayez plus tard.",
+  genericError: "Une erreur est survenue.",
+  notFound: "Page introuvable.",
+  loginTitle: "Connexion",
+  registerTitle: "Inscription",
+  emailLabel: "Email",
+  passwordLabel: "Mot de passe",
+  firstNameLabel: "Prenom",
+  lastNameLabel: "Nom",
+  loginLoading: "Connexion...",
+  loginSubmit: "Connexion",
+  registerSubmit: "Creer un compte",
+  registerLoading: "Envoi...",
+  verifyMissingToken: "Token manquant.",
+  verifySuccess: "Email verifie.",
+  verifyFailed: "Verification impossible.",
+  registerSuccess: "Inscription validee. Verifiez votre email.",
+};
