@@ -45,12 +45,16 @@ const routes: RouteRecordRaw[] = [
     component: Orders,
     meta: { requiresAuth: true, roles: ["ADMIN"] },
   },
-  ...(enableAuditLogs ? [{
-    path: "/audit-logs",
-    component: AuditLogs,
-    meta: { requiresAuth: true, roles: ["ADMIN"] },
-  }] : []),
-  },
+  ...(enableAuditLogs
+    ? [
+        {
+          path: "/audit-logs",
+          component: AuditLogs,
+          meta: { requiresAuth: true, roles: ["ADMIN"] },
+        },
+      ]
+    : []),
+
   { path: "/access-denied", component: ErrorPage },
   { path: "/server-error", component: ErrorPage, meta: { reason: "server" } },
   {
