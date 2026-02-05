@@ -218,17 +218,28 @@ const alerts = computed(() => {
 });
 
 const loadMetrics = async () => {
-  const [usersRes, productsRes, ordersRes, auditRes] = await Promise.all([
-    api.get("/users", noCache),
-    api.get("/products", noCache),
-    api.get("/orders", noCache),
-    api.get("/audit-logs", { params: { page: 1, limit: 1 } }),
-  ]);
+  const requests = [
+    api.get("/users"),
+    api.get("/products"),
+    api.get("/orders"),
+  ];
+
+  let auditRes = null;
+  if (enableAuditLogs) {
+    requests.push(api.get("/audit-logs", { params: { page: 1, limit: 1 } }));
+  }
+
+  const [usersRes, productsRes, ordersRes, auditMaybe] =
+    await Promise.all(requests);
+
+  if (enableAuditLogs) auditRes = auditMaybe;
 
   const users = usersRes.data?.users || usersRes.data || [];
   const products = productsRes.data || [];
   const orders = ordersRes.data || [];
-  const auditTotal = auditRes.data?.total ?? auditRes.data?.data?.length ?? 0;
+  const auditTotal = enableAuditLogs
+    ? (auditRes?.data?.total ?? auditRes?.data?.data?.length ?? 0)
+    : 0;
 
   metrics.value.users = users.length;
   metrics.value.products = products.length;
