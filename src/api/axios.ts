@@ -22,13 +22,15 @@ api.interceptors.response.use(
   (res) => res,
   (err) => {
     const status = err?.response?.status;
+    const url = err?.config?.url || "";
+    const isAuditLogs = url.includes("/audit-logs");
     const currentPath = `${window.location.pathname}${window.location.search}`;
     const onAuthPages =
       currentPath.startsWith("/login") ||
       currentPath.startsWith("/logout") ||
       currentPath.startsWith("/access-denied");
 
-    if (onAuthPages) {
+    if (onAuthPages || isAuditLogs) {
       return Promise.reject(err);
     }
 

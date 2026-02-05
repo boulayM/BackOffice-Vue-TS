@@ -2,6 +2,8 @@ import { createRouter, createWebHistory } from "vue-router";
 import type { RouteRecordRaw } from "vue-router";
 import { useAuthStore } from "../stores/auth";
 
+const enableAuditLogs = import.meta.env.VITE_ENABLE_AUDIT_LOGS === "true";
+
 import Login from "../views/Login.vue";
 import Dashboard from "../views/Dashboard.vue";
 import Users from "../views/Users.vue";
@@ -43,10 +45,11 @@ const routes: RouteRecordRaw[] = [
     component: Orders,
     meta: { requiresAuth: true, roles: ["ADMIN"] },
   },
-  {
+  ...(enableAuditLogs ? [{
     path: "/audit-logs",
     component: AuditLogs,
     meta: { requiresAuth: true, roles: ["ADMIN"] },
+  }] : []),
   },
   { path: "/access-denied", component: ErrorPage },
   { path: "/server-error", component: ErrorPage, meta: { reason: "server" } },

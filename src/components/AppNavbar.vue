@@ -7,7 +7,7 @@
         <RouterLink class="nav-link" to="/users">Users</RouterLink>
         <RouterLink class="nav-link" to="/products">Products</RouterLink>
         <RouterLink class="nav-link" to="/orders">Orders</RouterLink>
-        <RouterLink class="nav-link" to="/audit-logs">Audit Logs</RouterLink>
+        <RouterLink v-if="enableAuditLogs" class="nav-link" to="/audit-logs">Audit Logs</RouterLink>
       </div>
       <div class="nav-right">
         <span v-if="isLoggedIn" class="nav-email">{{ auth.user?.email }}</span>
@@ -30,6 +30,7 @@ import { useAuthStore } from "../stores/auth";
 const auth = useAuthStore();
 const router = useRouter();
 const isLoggedIn = computed(() => !!auth.user);
+const enableAuditLogs = import.meta.env.VITE_ENABLE_AUDIT_LOGS === "true";
 
 const handleLogout = async () => {
   await auth.logout();
