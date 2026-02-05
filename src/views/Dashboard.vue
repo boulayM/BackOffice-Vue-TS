@@ -162,6 +162,7 @@ import { RouterLink } from "vue-router";
 import api from "../api/axios";
 
 const enableAuditLogs = import.meta.env.VITE_ENABLE_AUDIT_LOGS === "true";
+const noCache = { headers: { "Cache-Control": "no-cache" } };
 
 const metrics = ref({
   orders: 0,
@@ -218,9 +219,9 @@ const alerts = computed(() => {
 
 const loadMetrics = async () => {
   const [usersRes, productsRes, ordersRes, auditRes] = await Promise.all([
-    api.get("/users"),
-    api.get("/products"),
-    api.get("/orders"),
+    api.get("/users", noCache),
+    api.get("/products", noCache),
+    api.get("/orders", noCache),
     api.get("/audit-logs", { params: { page: 1, limit: 1 } }),
   ]);
 
