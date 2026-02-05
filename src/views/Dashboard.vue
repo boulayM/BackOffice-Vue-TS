@@ -132,22 +132,25 @@
 
       <div class="mt-3 card-ui">
         <h2>Audit logs recents</h2>
-        <table class="table-ui">
-          <thead>
-            <tr>
-              <th>Action</th>
-              <th>User</th>
-              <th>Date</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr v-for="l in recentLogs" :key="l.id">
-              <td>{{ l.action }}</td>
-              <td>{{ l.userEmail || l.userId }}</td>
-              <td>{{ formatDate(l.createdAt) }}</td>
-            </tr>
-          </tbody>
-        </table>
+        <template v-if="enableAuditLogs">
+          <table class="table-ui">
+            <thead>
+              <tr>
+                <th>Action</th>
+                <th>User</th>
+                <th>Date</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-for="l in recentLogs" :key="l.id">
+                <td>{{ l.action }}</td>
+                <td>{{ l.userEmail || l.userId }}</td>
+                <td>{{ formatDate(l.createdAt) }}</td>
+              </tr>
+            </tbody>
+          </table>
+        </template>
+        <p v-else class="muted">Audit-logs indisponible en prod</p>
       </div>
     </div>
   </section>
@@ -157,6 +160,8 @@
 import { ref, onMounted, computed } from "vue";
 import { RouterLink } from "vue-router";
 import api from "../api/axios";
+
+const enableAuditLogs = import.meta.env.VITE_ENABLE_AUDIT_LOGS === "true";
 
 const metrics = ref({
   orders: 0,
@@ -269,6 +274,10 @@ const loadRecent = async () => {
 };
 
 const loadLogs = async () => {
+  if (!enableAuditLogs) {
+    recentLogs.value = [];
+    return;
+  }
   const res = await api.get("/audit-logs", {
     params: { page: 1, limit: 5, sort: "createdAt", order: "desc" },
   });
@@ -279,7 +288,9 @@ const loadLogs = async () => {
 onMounted(async () => {
   await loadMetrics();
   await loadRecent();
-  await loadLogs();
+  if (enableAuditLogs) {
+    await loadLogs();
+  }
 });
 </script>
 

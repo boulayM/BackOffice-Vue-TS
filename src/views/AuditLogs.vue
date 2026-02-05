@@ -164,6 +164,8 @@
 import { ref, onMounted, computed } from "vue";
 import api from "../api/axios";
 
+const enableAuditLogs = import.meta.env.VITE_ENABLE_AUDIT_LOGS === "true";
+
 const logs = ref([]);
 const selected = ref(null);
 const total = ref(0);
@@ -195,6 +197,11 @@ const buildFilters = () => {
 };
 
 const loadLogs = async () => {
+  if (!enableAuditLogs) {
+    logs.value = [];
+    total.value = 0;
+    return;
+  }
   try {
     const res = await api.get("/audit-logs", {
       params: {
