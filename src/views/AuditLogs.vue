@@ -196,7 +196,7 @@ const buildFilters = () => {
 
 const loadLogs = async () => {
   try {
-    const res = await api.get("/admin/audit-logs", {
+    const res = await api.get("/audit-logs", {
       params: {
         page: page.value,
         limit: limit.value,

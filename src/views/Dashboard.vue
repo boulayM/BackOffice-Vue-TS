@@ -212,26 +212,41 @@ const alerts = computed(() => {
 });
 
 const loadMetrics = async () => {
-  const [adminRes, usersRes, productsRes, ordersRes, auditRes] =
-    await Promise.all([
-      api.get("/admin/metrics"),
-      api.get("/admin/metrics/users"),
-      api.get("/admin/metrics/products"),
-      api.get("/admin/metrics/orders"),
-      api.get("/admin/metrics/audit-logs"),
-    ]);
+  const [usersRes, productsRes, ordersRes, auditRes] = await Promise.all([
+    api.get("/users"),
+    api.get("/products"),
+    api.get("/orders"),
+    api.get("/audit-logs", { params: { page: 1, limit: 1 } }),
+  ]);
 
-  const admin = adminRes.data || {};
-  metrics.value.orders = admin.orders ?? 0;
-  metrics.value.users = admin.users ?? 0;
-  metrics.value.products = admin.products ?? 0;
-  metrics.value.revenue = admin.revenue ?? 0;
-  metrics.value.ordersByStatus = admin.ordersByStatus || {};
+  const users = usersRes.data?.users || usersRes.data || [];
+  const products = productsRes.data || [];
+  const orders = ordersRes.data || [];
+  const auditTotal = auditRes.data?.total ?? auditRes.data?.data?.length ?? 0;
 
-  usersMetrics.value = usersRes.data || usersMetrics.value;
-  productsMetrics.value = productsRes.data || productsMetrics.value;
-  ordersMetrics.value = ordersRes.data || ordersMetrics.value;
-  auditMetrics.value = auditRes.data || auditMetrics.value;
+  metrics.value.users = users.length;
+  metrics.value.products = products.length;
+  metrics.value.orders = orders.length;
+  metrics.value.revenue = orders.reduce((sum, o) => sum + getTotal(o), 0);
+
+  const byStatus = orders.reduce((acc, o) => {
+    acc[o.status] = (acc[o.status] || 0) + 1;
+    return acc;
+  }, {});
+
+  metrics.value.ordersByStatus = byStatus;
+  usersMetrics.value = {
+    total: users.length,
+    verified: users.filter((u) => u.emailVerified).length,
+    unverified: users.filter((u) => !u.emailVerified).length,
+  };
+  productsMetrics.value = {
+    total: products.length,
+    active: products.filter((p) => p.isActive).length,
+    inactive: products.filter((p) => !p.isActive).length,
+  };
+  ordersMetrics.value = { total: orders.length, byStatus };
+  auditMetrics.value = { total: auditTotal };
 };
 
 const loadRecent = async () => {

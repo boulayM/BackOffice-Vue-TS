@@ -272,18 +272,25 @@ const loadUsers = async () => {
   loading.value = true;
   error.value = "";
   try {
-    const res = await api.get("/admin/users", {
-      params: {
-        page: page.value,
-        limit: limit.value,
-        sort: "id",
-        order: "desc",
-        q: q.value || undefined,
-        filters: buildFilters(),
-      },
-    });
-    users.value = res.data?.data || res.data?.users || res.data || [];
-    total.value = res.data?.total ?? users.value.length;
+    const res = await api.get("/users");
+    const all = res.data?.users || res.data || [];
+
+    let filtered = all;
+    if (q.value) {
+      const qv = q.value.toLowerCase();
+      filtered = filtered.filter(
+        (u) =>
+          String(u.id).includes(qv) ||
+          String(u.email || "").toLowerCase().includes(qv),
+      );
+    }
+    if (roleFilter.value) {
+      filtered = filtered.filter((u) => u.role === roleFilter.value);
+    }
+
+    total.value = filtered.length;
+    const start = (page.value - 1) * limit.value;
+    users.value = filtered.slice(start, start + limit.value);
     selectedIds.value = [];
   } catch {
     error.value = "Erreur lors du chargement des utilisateurs.";

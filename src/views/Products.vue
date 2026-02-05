@@ -270,18 +270,27 @@ const loadProducts = async () => {
   loading.value = true;
   error.value = "";
   try {
-    const res = await api.get("/admin/products", {
-      params: {
-        page: page.value,
-        limit: limit.value,
-        sort: "id",
-        order: "desc",
-        q: q.value || undefined,
-        filters: buildFilters(),
-      },
-    });
-    products.value = res.data?.data || res.data?.products || res.data || [];
-    total.value = res.data?.total ?? products.value.length;
+    const res = await api.get("/products");
+    const all = res.data || [];
+
+    let filtered = all;
+    if (q.value) {
+      const qv = q.value.toLowerCase();
+      filtered = filtered.filter(
+        (p) =>
+          String(p.name || "").toLowerCase().includes(qv) ||
+          String(p.description || "").toLowerCase().includes(qv),
+      );
+    }
+    if (activeFilter.value === "true") {
+      filtered = filtered.filter((p) => p.isActive === true);
+    } else if (activeFilter.value === "false") {
+      filtered = filtered.filter((p) => p.isActive === false);
+    }
+
+    total.value = filtered.length;
+    const start = (page.value - 1) * limit.value;
+    products.value = filtered.slice(start, start + limit.value);
     selectedIds.value = [];
   } catch {
     error.value = "Erreur lors du chargement des produits.";

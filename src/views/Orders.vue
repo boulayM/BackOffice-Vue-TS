@@ -261,18 +261,36 @@ const buildFilters = () => {
 
 const loadOrders = async () => {
   try {
-    const res = await api.get("/admin/orders", {
-      params: {
-        page: page.value,
-        limit: limit.value,
-        sort: "orderDate",
-        order: "desc",
-        q: q.value || undefined,
-        filters: buildFilters(),
-      },
-    });
-    orders.value = res.data?.data || res.data?.orders || res.data || [];
-    total.value = res.data?.total ?? orders.value.length;
+    const res = await api.get("/orders");
+    const all = res.data || [];
+
+    let filtered = all;
+    if (q.value) {
+      const qv = q.value.toLowerCase();
+      filtered = filtered.filter(
+        (o) =>
+          String(o.id).includes(qv) ||
+          String(o.user?.email || o.userId || "").toLowerCase().includes(qv),
+      );
+    }
+    if (statusFilter.value) {
+      filtered = filtered.filter((o) => o.status === statusFilter.value);
+    }
+    if (userIdFilter.value) {
+      filtered = filtered.filter((o) => o.userId === userIdFilter.value);
+    }
+    if (dateFrom.value) {
+      const from = new Date(dateFrom.value);
+      filtered = filtered.filter((o) => new Date(o.orderDate) >= from);
+    }
+    if (dateTo.value) {
+      const to = new Date(dateTo.value);
+      filtered = filtered.filter((o) => new Date(o.orderDate) <= to);
+    }
+
+    total.value = filtered.length;
+    const start = (page.value - 1) * limit.value;
+    orders.value = filtered.slice(start, start + limit.value);
     selectedIds.value = [];
   } catch {
     error.value = "Erreur lors du chargement des commandes.";
