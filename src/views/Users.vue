@@ -262,12 +262,6 @@ const allSelected = computed(
     users.value.length > 0 && selectedIds.value.length === users.value.length,
 );
 
-const buildFilters = () => {
-  const filters = {};
-  if (roleFilter.value) filters.role = roleFilter.value;
-  return Object.keys(filters).length ? JSON.stringify(filters) : undefined;
-};
-
 const loadUsers = async () => {
   loading.value = true;
   error.value = "";
@@ -275,13 +269,15 @@ const loadUsers = async () => {
     const res = await api.get("/users");
     const all = res.data?.users || res.data || [];
 
-    let filtered = all;
+    let filtered = all.filter((u) => u.role !== "ADMIN");
     if (q.value) {
       const qv = q.value.toLowerCase();
       filtered = filtered.filter(
         (u) =>
           String(u.id).includes(qv) ||
-          String(u.email || "").toLowerCase().includes(qv),
+          String(u.email || "")
+            .toLowerCase()
+            .includes(qv),
       );
     }
     if (roleFilter.value) {

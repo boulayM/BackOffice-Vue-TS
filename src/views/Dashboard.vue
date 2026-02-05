@@ -162,7 +162,6 @@ import { RouterLink } from "vue-router";
 import api from "../api/axios";
 
 const enableAuditLogs = import.meta.env.VITE_ENABLE_AUDIT_LOGS === "true";
-const noCache = { headers: { "Cache-Control": "no-cache" } };
 
 const metrics = ref({
   orders: 0,
