@@ -122,7 +122,7 @@
           }}
         </div>
         <div class="mt-2">
-          <strong>Role:</strong> {{ selected.actor?.role || "-" }}
+          <strong>Role:</strong> {{ selected.actor?.role || selected.actorRole || selected.userRole || selected.role || "-" }}
         </div>
         <div class="mt-2">
           <strong>Target:</strong>
@@ -130,10 +130,10 @@
           {{ selected.target?.id || selected.resourceId || "" }}
         </div>
         <div class="mt-2">
-          <strong>Status:</strong> {{ selected.status || "-" }}
+          <strong>Status:</strong> {{ selected.status || selected.outcome || selected.result || "-" }}
         </div>
         <div class="mt-2">
-          <strong>RequestId:</strong> {{ selected.requestId || "-" }}
+          <strong>RequestId:</strong> {{ selected.requestId || selected.requestID || selected.reqId || selected.request_id || "-" }}
         </div>
         <div class="mt-2">
           <strong>IP:</strong> {{ selected.actor?.ip || selected.ip || "-" }}

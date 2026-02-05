@@ -288,6 +288,8 @@ const loadProducts = async () => {
       filtered = filtered.filter((p) => p.isActive === false);
     }
 
+    filtered = filtered.sort((a, b) => b.id - a.id);
+
     total.value = filtered.length;
     const start = (page.value - 1) * limit.value;
     products.value = filtered.slice(start, start + limit.value);
@@ -307,6 +309,7 @@ const applyFilters = () => {
 const createProduct = async () => {
   await api.post("/products", form.value);
   form.value = { name: "", description: "", price: 0, isActive: true };
+  page.value = 1;
   await loadProducts();
 };
 

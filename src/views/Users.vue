@@ -23,7 +23,7 @@
             @change="applyFilters"
           >
             <option value="">Tous</option>
-            <option v-for="r in roles" :key="r" :value="r">{{ r }}</option>
+            <option v-for="r in roles" :key="r" :value="r" :disabled="r !== 'USER'">{{ r }}</option>
           </select>
         </div>
       </div>
@@ -31,11 +31,11 @@
       <div class="mt-3 grid grid-md-2">
         <div>
           <label class="form-label">Creer un utilisateur</label>
-          <form class="form-ui" @submit.prevent="createUser">
+          <form class="form-ui" @submit.prevent="createUser" autocomplete="off">
             <div class="form-row">
               <label class="form-label" for="userFirstName">Prenom</label>
               <input
-                id="userFirstName"
+                id="userFirstName" autocomplete="off"
                 class="form-control"
                 v-model="form.firstName"
                 required
@@ -44,7 +44,7 @@
             <div class="form-row">
               <label class="form-label" for="userLastName">Nom</label>
               <input
-                id="userLastName"
+                id="userLastName" autocomplete="off"
                 class="form-control"
                 v-model="form.lastName"
                 required
@@ -53,7 +53,7 @@
             <div class="form-row">
               <label class="form-label" for="userEmail">Email</label>
               <input
-                id="userEmail"
+                id="userEmail" autocomplete="off"
                 class="form-control"
                 type="email"
                 v-model="form.email"
@@ -63,7 +63,7 @@
             <div class="form-row">
               <label class="form-label" for="userPassword">Mot de passe</label>
               <input
-                id="userPassword"
+                id="userPassword" autocomplete="new-password"
                 class="form-control"
                 type="password"
                 v-model="form.password"
@@ -73,7 +73,7 @@
             <div class="form-row">
               <label class="form-label" for="userRole">Role</label>
               <select id="userRole" class="form-control" v-model="form.role">
-                <option v-for="r in roles" :key="r" :value="r">{{ r }}</option>
+                <option v-for="r in roles" :key="r" :value="r" :disabled="r !== 'USER'">{{ r }}</option>
               </select>
             </div>
             <div class="actions">
@@ -117,7 +117,7 @@
                 class="form-control"
                 v-model="edit.role"
               >
-                <option v-for="r in roles" :key="r" :value="r">{{ r }}</option>
+                <option v-for="r in roles" :key="r" :value="r" :disabled="r !== 'USER'">{{ r }}</option>
               </select>
             </div>
             <div class="actions">
@@ -140,7 +140,7 @@
           <div class="text-right">
             <select class="form-control inline-select" v-model="batchRole">
               <option value="">Role batch...</option>
-              <option v-for="r in roles" :key="r" :value="r">{{ r }}</option>
+              <option v-for="r in roles" :key="r" :value="r" :disabled="r !== 'USER'">{{ r }}</option>
             </select>
             <button
               class="btn-ui"
@@ -221,6 +221,7 @@
 import { ref, onMounted, computed } from "vue";
 import api from "../api/axios";
 import { uiMessages } from "../messages/uiMessages";
+import { toast } from "../services/toast";
 
 const roles = ["ADMIN", "MANAGER", "SUPPORT", "READONLY", "USER"];
 
@@ -284,6 +285,8 @@ const loadUsers = async () => {
       filtered = filtered.filter((u) => u.role === roleFilter.value);
     }
 
+    filtered = filtered.sort((a, b) => b.id - a.id);
+
     total.value = filtered.length;
     const start = (page.value - 1) * limit.value;
     users.value = filtered.slice(start, start + limit.value);
@@ -301,15 +304,21 @@ const applyFilters = () => {
 };
 
 const createUser = async () => {
-  await api.post("/users/register", form.value);
-  form.value = {
-    firstName: "",
-    lastName: "",
-    email: "",
-    password: "",
-    role: "USER",
-  };
-  await loadUsers();
+  try {
+    await api.post("/users/register", { ...form.value, role: "USER" });
+    form.value = {
+      firstName: "",
+      lastName: "",
+      email: "",
+      password: "",
+      role: "USER",
+    };
+    page.value = 1;
+    toast.success(uiMessages.users.created);
+    await loadUsers();
+  } catch {
+    toast.error(uiMessages.users.createError);
+  }
 };
 
 const editUser = (u) => {
@@ -335,14 +344,19 @@ const cancelEdit = () => {
 };
 
 const updateUser = async () => {
-  await api.patch(`/users/${edit.value.id}`, {
-    firstName: edit.value.firstName,
-    lastName: edit.value.lastName,
-    email: edit.value.email,
-    role: edit.value.role,
-  });
-  cancelEdit();
-  await loadUsers();
+  try {
+    await api.patch(`/users/${edit.value.id}`, {
+      firstName: edit.value.firstName,
+      lastName: edit.value.lastName,
+      email: edit.value.email,
+      role: edit.value.role,
+    });
+    cancelEdit();
+    toast.success(uiMessages.users.updated);
+    await loadUsers();
+  } catch {
+    toast.error(uiMessages.users.updateError);
+  }
 };
 
 const deleteUser = async (u) => {

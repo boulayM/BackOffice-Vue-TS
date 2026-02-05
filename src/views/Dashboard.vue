@@ -233,7 +233,8 @@ const loadMetrics = async () => {
 
   if (enableAuditLogs) auditRes = auditMaybe;
 
-  const users = usersRes.data?.users || usersRes.data || [];
+  const usersAll = usersRes.data?.users || usersRes.data || [];
+  const users = usersAll.filter((u) => u.role !== "ADMIN");
   const products = productsRes.data || [];
   const orders = ordersRes.data || [];
   const auditTotal = enableAuditLogs
@@ -277,11 +278,14 @@ const loadRecent = async () => {
 
   const orders =
     ordersRes.data?.data || ordersRes.data?.orders || ordersRes.data || [];
-  const users =
+  const usersRaw =
     usersRes.data?.data || usersRes.data?.users || usersRes.data || [];
+  const users = usersRaw
+    .filter((u) => u.role !== "ADMIN")
+    .sort((a, b) => b.id - a.id);
 
   recentOrders.value = orders;
-  recentUsers.value = users;
+  recentUsers.value = users.slice(0, 5);
 };
 
 const loadLogs = async () => {

@@ -206,6 +206,7 @@
 import { ref, onMounted, computed } from "vue";
 import api from "../api/axios";
 import { uiMessages } from "../messages/uiMessages";
+import { toast } from "../services/toast";
 
 const statuses = ["PENDING", "PAID", "CANCELLED"];
 
@@ -316,7 +317,9 @@ const updateStatus = async () => {
   await api.patch(`/orders/${selected.value.id}/status`, {
     status: selected.value.status,
   });
+  toast.success(uiMessages.orders.statusUpdated);
   await loadOrders();
+  window.scrollTo({ top: 0, behavior: "smooth" });
 };
 
 const deleteOrder = async (order) => {

@@ -8,6 +8,7 @@ export const uiMessages = {
     created: (productName) => `Nouvelle commande creee avec ${productName}.`,
     addedToActive: (productName) =>
       `${productName} ajoute a la commande active.`,
+    statusUpdated: "Commande mise a jour.",
   },
   products: {
     invalidForm: "Veuillez renseigner un nom et un prix valides.",
@@ -18,5 +19,9 @@ export const uiMessages = {
   },
   users: {
     deleteConfirm: (email) => `Supprimer ${email} ?`,
+    created: "Utilisateur cree avec succes.",
+    updated: "Utilisateur modifie avec succes.",
+    createError: "Erreur lors de la creation de l utilisateur.",
+    updateError: "Erreur lors de la modification de l utilisateur.",
   },
 };
