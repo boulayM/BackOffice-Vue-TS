@@ -23,7 +23,14 @@
             @change="applyFilters"
           >
             <option value="">Tous</option>
-            <option v-for="r in roles" :key="r" :value="r" :disabled="r !== 'USER'">{{ r }}</option>
+            <option
+              v-for="r in roles"
+              :key="r"
+              :value="r"
+              :disabled="r !== 'USER'"
+            >
+              {{ r }}
+            </option>
           </select>
         </div>
       </div>
@@ -35,7 +42,8 @@
             <div class="form-row">
               <label class="form-label" for="userFirstName">Prenom</label>
               <input
-                id="userFirstName" autocomplete="off"
+                id="userFirstName"
+                autocomplete="off"
                 class="form-control"
                 v-model="form.firstName"
                 required
@@ -44,7 +52,8 @@
             <div class="form-row">
               <label class="form-label" for="userLastName">Nom</label>
               <input
-                id="userLastName" autocomplete="off"
+                id="userLastName"
+                autocomplete="off"
                 class="form-control"
                 v-model="form.lastName"
                 required
@@ -53,7 +62,8 @@
             <div class="form-row">
               <label class="form-label" for="userEmail">Email</label>
               <input
-                id="userEmail" autocomplete="off"
+                id="userEmail"
+                autocomplete="off"
                 class="form-control"
                 type="email"
                 v-model="form.email"
@@ -63,7 +73,8 @@
             <div class="form-row">
               <label class="form-label" for="userPassword">Mot de passe</label>
               <input
-                id="userPassword" autocomplete="new-password"
+                id="userPassword"
+                autocomplete="new-password"
                 class="form-control"
                 type="password"
                 v-model="form.password"
@@ -73,7 +84,14 @@
             <div class="form-row">
               <label class="form-label" for="userRole">Role</label>
               <select id="userRole" class="form-control" v-model="form.role">
-                <option v-for="r in roles" :key="r" :value="r" :disabled="r !== 'USER'">{{ r }}</option>
+                <option
+                  v-for="r in roles"
+                  :key="r"
+                  :value="r"
+                  :disabled="r !== 'USER'"
+                >
+                  {{ r }}
+                </option>
               </select>
             </div>
             <div class="actions">
@@ -117,7 +135,14 @@
                 class="form-control"
                 v-model="edit.role"
               >
-                <option v-for="r in roles" :key="r" :value="r" :disabled="r !== 'USER'">{{ r }}</option>
+                <option
+                  v-for="r in roles"
+                  :key="r"
+                  :value="r"
+                  :disabled="r !== 'USER'"
+                >
+                  {{ r }}
+                </option>
               </select>
             </div>
             <div class="actions">
@@ -140,7 +165,14 @@
           <div class="text-right">
             <select class="form-control inline-select" v-model="batchRole">
               <option value="">Role batch...</option>
-              <option v-for="r in roles" :key="r" :value="r" :disabled="r !== 'USER'">{{ r }}</option>
+              <option
+                v-for="r in roles"
+                :key="r"
+                :value="r"
+                :disabled="r !== 'USER'"
+              >
+                {{ r }}
+              </option>
             </select>
             <button
               class="btn-ui"
@@ -316,8 +348,9 @@ const createUser = async () => {
     page.value = 1;
     toast.success(uiMessages.users.created);
     await loadUsers();
-  } catch {
-    toast.error(uiMessages.users.createError);
+  } catch (err) {
+    const apiMsg = err?.response?.data?.message;
+    toast.error(apiMsg || uiMessages.users.createError);
   }
 };
 
